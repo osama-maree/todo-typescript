@@ -85,10 +85,11 @@ const App: React.FC = () => {
           variant="body2"
           component={"div"}
         >
-          <Typography variant="body1" color="white">
-            Completed Task
-          </Typography>
-
+          {tasks.find((todo: todo) => todo.completed) && (
+            <Typography variant="body1" color="white">
+              Completed Task
+            </Typography>
+          )}
           {tasks.map((todo: todo, index: number) =>
             todo.completed ? (
               <ItemList
