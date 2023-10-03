@@ -1,13 +1,13 @@
 import { Box, TextField, Typography } from "@mui/material";
 import { useStyles } from "./style/useStyle";
-import { useState, useReducer } from "react";
+import { useState, useReducer, useEffect } from "react";
 import { TaskActionType, todo } from "./feature/Types";
 import tasksReducer from "./reducer/taskReducer";
 import ItemList from "./component/ItemList";
 const initialTasks: todo[] = [];
 const App: React.FC = () => {
   const [text, setText] = useState<String>("");
-  const [completedTasks, setCompletedTasks] = useState<todo[]>([]);
+  // const [completedTasks, setCompletedTasks] = useState<todo[]>([]);
   // const [uncompletedTasks, setUnCompletedTasks] = useState<todo[]>([]);
   const [tasks, dispatch] = useReducer(tasksReducer, initialTasks);
   const classes = useStyles();
@@ -23,11 +23,15 @@ const App: React.FC = () => {
   const handleDelete = (index: number) => {
     dispatch({ type: TaskActionType.DELETE, index });
   };
-  const handleCompleted= (index: number) => {
+  const handleCompleted = (index: number) => {
     dispatch({ type: TaskActionType.COMPLETED, index });
-  }
+  };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setText(e.target.value);
+  // useEffect(() => {
+  //   setCompletedTasks(tasks.filter((todo: todo) => todo.completed));
+  //   setUnCompletedTasks(tasks.filter((todo: todo) => !todo.completed));
+  // }, [tasks]);
   return (
     <Box className={classes.app} p={3} mt={5}>
       <Typography
@@ -63,15 +67,17 @@ const App: React.FC = () => {
           variant="body2"
           component={"div"}
         >
-          {tasks.map((todo: todo, index: number) => (
-            <ItemList
-              key={index}
-              todo={todo}
-              index={index}
-              handleDelete={handleDelete}
-              handleCompleted={handleCompleted}
-            />
-          ))}
+          {tasks.map((todo: todo, index: number) =>
+            todo.completed ? null : (
+              <ItemList
+                key={index}
+                todo={todo}
+                index={index}
+                handleDelete={handleDelete}
+                handleCompleted={handleCompleted}
+              />
+            )
+          )}
         </Typography>
 
         <Typography
@@ -79,14 +85,21 @@ const App: React.FC = () => {
           variant="body2"
           component={"div"}
         >
-          {!!completedTasks.length && (
-            <Typography variant="body1" color="white">
-              Completed Task
-            </Typography>
+          <Typography variant="body1" color="white">
+            Completed Task
+          </Typography>
+
+          {tasks.map((todo: todo, index: number) =>
+            todo.completed ? (
+              <ItemList
+                key={index}
+                todo={todo}
+                index={index}
+                handleDelete={handleDelete}
+                handleCompleted={handleCompleted}
+              />
+            ) : null
           )}
-          {completedTasks.map((todo: todo, index: number) => (
-            <ItemList key={index} todo={todo} />
-          ))}
         </Typography>
       </Typography>
     </Box>
