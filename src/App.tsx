@@ -1,14 +1,12 @@
 import { Box, TextField, Typography } from "@mui/material";
 import { useStyles } from "./style/useStyle";
-import { useState, useReducer, useEffect } from "react";
+import { useState, useReducer } from "react";
 import { TaskActionType, todo } from "./feature/Types";
 import tasksReducer from "./reducer/taskReducer";
 import ItemList from "./component/ItemList";
 const initialTasks: todo[] = [];
 const App: React.FC = () => {
   const [text, setText] = useState<String>("");
-  // const [completedTasks, setCompletedTasks] = useState<todo[]>([]);
-  // const [uncompletedTasks, setUnCompletedTasks] = useState<todo[]>([]);
   const [tasks, dispatch] = useReducer(tasksReducer, initialTasks);
   const classes = useStyles();
   const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -28,10 +26,6 @@ const App: React.FC = () => {
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setText(e.target.value);
-  // useEffect(() => {
-  //   setCompletedTasks(tasks.filter((todo: todo) => todo.completed));
-  //   setUnCompletedTasks(tasks.filter((todo: todo) => !todo.completed));
-  // }, [tasks]);
   return (
     <Box className={classes.app} p={3} mt={5}>
       <Typography
