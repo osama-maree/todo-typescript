@@ -1,20 +1,33 @@
 import { Box, TextField, Typography } from "@mui/material";
 import { useStyles } from "./style/useStyle";
-import { useState } from "react";
-import { todo } from "./feature/Interfaces";
-
+import { useState, useReducer } from "react";
+import { TaskActionType, todo } from "./feature/Types";
+import tasksReducer from "./reducer/taskReducer";
+import ItemList from "./component/ItemList";
+const initialTasks: todo[] = [];
 const App: React.FC = () => {
   const [text, setText] = useState<String>("");
   const [completedTasks, setCompletedTasks] = useState<todo[]>([]);
-  const [uncompletedTasks, setUnCompletedTasks] = useState<todo[]>([]);
+  // const [uncompletedTasks, setUnCompletedTasks] = useState<todo[]>([]);
+  const [tasks, dispatch] = useReducer(tasksReducer, initialTasks);
   const classes = useStyles();
-
   const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter") {
-      // setUnCompletedTasks((prev) => [...(prev || []), newTodo]);
+    if (e.key === "Enter" && text) {
+      dispatch({
+        type: TaskActionType.ADD,
+        payload: { completed: false, content: text },
+      });
       setText(() => "");
     }
   };
+  const handleDelete = (index: number) => {
+    dispatch({ type: TaskActionType.DELETE, index });
+  };
+  const handleCompleted= (index: number) => {
+    dispatch({ type: TaskActionType.COMPLETED, index });
+  }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setText(e.target.value);
   return (
     <Box className={classes.app} p={3} mt={5}>
       <Typography
@@ -29,9 +42,7 @@ const App: React.FC = () => {
         className={classes.inputTodo}
         value={text}
         onKeyPress={handleKeyPress}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setText(e.target.value)
-        }
+        onChange={handleChange}
         inputProps={{
           style: {
             color: "white",
@@ -40,6 +51,44 @@ const App: React.FC = () => {
         placeholder="Add New Task..."
         type="text"
       />
+
+      <Typography
+        className={`${classes.todo}`}
+        variant="body2"
+        component={"div"}
+        mt={4}
+      >
+        <Typography
+          className={`${classes.todo}`}
+          variant="body2"
+          component={"div"}
+        >
+          {tasks.map((todo: todo, index: number) => (
+            <ItemList
+              key={index}
+              todo={todo}
+              index={index}
+              handleDelete={handleDelete}
+              handleCompleted={handleCompleted}
+            />
+          ))}
+        </Typography>
+
+        <Typography
+          className={`${classes.todo}`}
+          variant="body2"
+          component={"div"}
+        >
+          {!!completedTasks.length && (
+            <Typography variant="body1" color="white">
+              Completed Task
+            </Typography>
+          )}
+          {completedTasks.map((todo: todo, index: number) => (
+            <ItemList key={index} todo={todo} />
+          ))}
+        </Typography>
+      </Typography>
     </Box>
   );
 };
